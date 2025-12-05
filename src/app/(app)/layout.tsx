@@ -77,12 +77,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   };
 
   React.useEffect(() => {
-    if (!isUserLoading && !user) {
+    if (!isUserLoading && (!user || !user.emailVerified)) {
       router.push('/login');
     }
   }, [user, isUserLoading, router]);
 
-  if (isUserLoading || !user) {
+  if (isUserLoading || !user || !user.emailVerified) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         Loading...

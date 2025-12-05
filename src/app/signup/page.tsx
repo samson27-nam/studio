@@ -18,7 +18,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Logo } from '@/components/logo';
 import { useAuth } from '@/firebase';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, sendEmailVerification, signOut } from 'firebase/auth';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle, Upload } from 'lucide-react';
 
@@ -44,6 +44,7 @@ export default function SignupPage() {
   const auth = useAuth();
   const [error, setError] = useState<string | null>(null);
   const [fileName, setFileName] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     register,
@@ -63,10 +64,12 @@ export default function SignupPage() {
 
   const handleSignup: SubmitHandler<FormSchema> = async (data) => {
     setError(null);
+    setIsLoading(true);
     try {
-      await createUserWithEmailAndPassword(auth, data.email, data.password);
-      // In a real app, you would also update the user's profile with name and photoURL
-      router.push('/dashboard');
+      const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
+      await sendEmailVerification(userCredential.user);
+      await signOut(auth);
+      router.push(`/verify-email?email=${encodeURIComponent(data.email)}`);
     } catch (err: any) {
       if (err.code === 'auth/email-already-in-use') {
         setError('User already exists. Please try logging in.');
@@ -74,6 +77,8 @@ export default function SignupPage() {
         setError('An unexpected error occurred. Please try again.');
         console.error(err);
       }
+    } finally {
+        setIsLoading(false);
     }
   };
 
@@ -159,8 +164,8 @@ export default function SignupPage() {
                 )}
               </div>
 
-              <Button type="submit" className="w-full">
-                Create Account
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? 'Creating Account...' : 'Create Account'}
               </Button>
             </div>
           </form>
