@@ -98,7 +98,7 @@ export default function SettingsPage() {
 
       if (data.profilePhoto && data.profilePhoto.length > 0) {
         const file = data.profilePhoto[0];
-        const storageRef = ref(storage, `profilePhotos/${user.uid}`);
+        const storageRef = ref(storage, `user_profile_images/${user.uid}`);
         await uploadBytes(storageRef, file);
         photoURL = await getDownloadURL(storageRef);
       }
@@ -148,7 +148,7 @@ export default function SettingsPage() {
         // We need to derive the storage path from the URL.
         // This assumes the default structure. Be cautious with this approach.
         try {
-            const photoRef = ref(storage, `profilePhotos/${user.uid}`);
+            const photoRef = ref(storage, `user_profile_images/${user.uid}`);
             await deleteObject(photoRef);
         } catch (storageError: any) {
             // Log if the photo deletion fails but continue with account deletion
@@ -171,7 +171,8 @@ export default function SettingsPage() {
       // Redirect to home or login page after a short delay
       setTimeout(() => router.push('/'), 1000);
 
-    } catch (err: any) {
+    } catch (err: any)
+      {
       console.error("Account deletion failed:", err);
       setError("Failed to delete account. You may need to re-authenticate.");
       // If re-authentication is required, Firebase throws 'auth/requires-recent-login'

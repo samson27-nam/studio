@@ -112,7 +112,7 @@ export default function SignupPage() {
       let photoURL: string | undefined = undefined;
       if (data.profilePhoto && data.profilePhoto[0]) {
         const file = data.profilePhoto[0];
-        const storageRef = ref(storage, `profilePhotos/${user.uid}`);
+        const storageRef = ref(storage, `user_profile_images/${user.uid}`);
         await uploadBytes(storageRef, file);
         photoURL = await getDownloadURL(storageRef);
       }
