@@ -55,7 +55,7 @@ export default function Home() {
             <Link href="/login">Login</Link>
           </Button>
           <Button asChild>
-            <Link href="/login">Get Started</Link>
+            <Link href="/signup">Get Started</Link>
           </Button>
         </nav>
       </header>
@@ -78,7 +78,7 @@ export default function Home() {
             </p>
             <div className="mt-8">
               <Button size="lg" asChild>
-                <Link href="/login">Join the Community</Link>
+                <Link href="/signup">Join the Community</Link>
               </Button>
             </div>
           </div>

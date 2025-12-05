@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -13,16 +14,51 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Logo } from '@/components/logo';
+import { useAuth, useUser } from '@/firebase';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { AlertCircle } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
+  const auth = useAuth();
+  const { user, isUserLoading } = useUser();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real application, you would perform authentication here.
-    // For this demo, we'll just redirect to the dashboard.
-    router.push('/dashboard');
+    setError(null);
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      router.push('/dashboard');
+    } catch (err: any) {
+      if (
+        err.code === 'auth/user-not-found' ||
+        err.code === 'auth/wrong-password' ||
+        err.code === 'auth/invalid-credential'
+      ) {
+        setError('Password or email incorrect.');
+      } else {
+        setError('An unexpected error occurred. Please try again.');
+        console.error(err);
+      }
+    }
   };
+
+  if (isUserLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        Loading...
+      </div>
+    );
+  }
+
+  if (user) {
+    router.push('/dashboard');
+    return null;
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-muted/40 p-4">
@@ -31,12 +67,21 @@ export default function LoginPage() {
           <div className="mb-4 flex justify-center">
             <Logo />
           </div>
-          <CardTitle className="font-headline text-2xl">Admin & Member Login</CardTitle>
+          <CardTitle className="font-headline text-2xl">
+            Admin & Member Login
+          </CardTitle>
           <CardDescription>
             Enter your credentials to access your account.
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {error && (
+            <Alert variant="destructive" className="mb-4">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Login Failed</AlertTitle>
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
           <form onSubmit={handleLogin}>
             <div className="grid gap-4">
               <div className="grid gap-2">
@@ -46,7 +91,8 @@ export default function LoginPage() {
                   type="email"
                   placeholder="m.smith@example.com"
                   required
-                  defaultValue="admin@civil.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
               <div className="grid gap-2">
@@ -59,7 +105,13 @@ export default function LoginPage() {
                     Forgot your password?
                   </Link>
                 </div>
-                <Input id="password" type="password" required defaultValue="password" />
+                <Input
+                  id="password"
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
               </div>
               <Button type="submit" className="w-full">
                 Login
@@ -68,7 +120,7 @@ export default function LoginPage() {
           </form>
           <div className="mt-4 text-center text-sm">
             Not a member?{' '}
-            <Link href="#" className="underline">
+            <Link href="/signup" className="underline">
               Sign up
             </Link>
           </div>
