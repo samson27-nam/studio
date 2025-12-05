@@ -14,7 +14,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Logo } from '@/components/logo';
-import { useAuth, useUser } from '@/firebase';
+import { useAuth, useUser, initializeFirebase } from '@/firebase';
 import {
   signInWithEmailAndPassword,
   sendEmailVerification,
@@ -22,6 +22,7 @@ import {
   signInWithPopup,
   GoogleAuthProvider,
 } from 'firebase/auth';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
@@ -51,6 +52,7 @@ const GoogleIcon = () => (
 export default function LoginPage() {
   const router = useRouter();
   const auth = useAuth();
+  const { firestore } = initializeFirebase();
   const { user, isUserLoading } = useUser();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -67,14 +69,30 @@ export default function LoginPage() {
         email,
         password
       );
-      if (!userCredential.user.emailVerified) {
+      const loggedInUser = userCredential.user;
+
+      if (!loggedInUser.emailVerified) {
         // Send a verification email to the user.
-        await sendEmailVerification(userCredential.user);
+        await sendEmailVerification(loggedInUser);
         // Log the user out and redirect to verification page
         await signOut(auth);
         router.push(`/verify-email?email=${encodeURIComponent(email)}`);
         return;
       }
+      
+      // Check if user exists in Firestore, if not, create them
+      const userDocRef = doc(firestore, 'users', loggedInUser.uid);
+      const userDoc = await getDoc(userDocRef);
+      if (!userDoc.exists()) {
+        await setDoc(userDocRef, {
+          id: loggedInUser.uid,
+          name: loggedInUser.displayName,
+          email: loggedInUser.email,
+          profilePhotoURL: loggedInUser.photoURL,
+        }, { merge: true });
+      }
+
+
       router.push('/dashboard');
     } catch (err: any) {
       if (
@@ -97,7 +115,18 @@ export default function LoginPage() {
     setIsLoading(true);
     const provider = new GoogleAuthProvider();
     try {
-      await signInWithPopup(auth, provider);
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      // Create user document in Firestore if it doesn't exist
+      const userDocRef = doc(firestore, 'users', user.uid);
+      await setDoc(userDocRef, {
+        id: user.uid,
+        name: user.displayName,
+        email: user.email,
+        profilePhotoURL: user.photoURL,
+      }, { merge: true });
+
       router.push('/dashboard');
     } catch (err: any) {
       setError('Failed to sign in with Google. Please try again.');

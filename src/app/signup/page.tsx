@@ -27,6 +27,7 @@ import {
   GoogleAuthProvider,
 } from 'firebase/auth';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { doc, setDoc } from 'firebase/firestore';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle, Upload } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
@@ -72,7 +73,7 @@ type FormSchema = z.infer<typeof formSchema>;
 export default function SignupPage() {
   const router = useRouter();
   const auth = useAuth();
-  const { firebaseApp } = initializeFirebase();
+  const { firebaseApp, firestore } = initializeFirebase();
   const storage = getStorage(firebaseApp);
   const [error, setError] = useState<string | null>(null);
   const [fileName, setFileName] = useState('');
@@ -121,6 +122,15 @@ export default function SignupPage() {
         photoURL: photoURL,
       });
 
+      // Create user document in Firestore
+      const userDocRef = doc(firestore, 'users', user.uid);
+      await setDoc(userDocRef, {
+        id: user.uid,
+        name: data.name,
+        email: data.email,
+        profilePhotoURL: photoURL || null,
+      });
+
       // After updating the profile, reload the user object to get the latest data
       await user.reload();
       
@@ -144,7 +154,18 @@ export default function SignupPage() {
     setIsLoading(true);
     const provider = new GoogleAuthProvider();
     try {
-      await signInWithPopup(auth, provider);
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      // Create user document in Firestore if it doesn't exist
+      const userDocRef = doc(firestore, 'users', user.uid);
+      await setDoc(userDocRef, {
+        id: user.uid,
+        name: user.displayName,
+        email: user.email,
+        profilePhotoURL: user.photoURL,
+      }, { merge: true });
+
       router.push('/dashboard');
     } catch (err: any) {
       setError('Failed to sign in with Google. Please try again.');

@@ -11,17 +11,30 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useAuth, useUser, initializeFirebase } from '@/firebase';
-import { updateProfile } from 'firebase/auth';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { useAuth, useUser, initializeFirebase, useFirestore } from '@/firebase';
+import { updateProfile, deleteUser } from 'firebase/auth';
+import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
+import { doc, setDoc, deleteDoc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { AlertCircle, Upload, Loader2 } from 'lucide-react';
+import { AlertCircle, Upload, Loader2, LogOut } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 const formSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
@@ -31,7 +44,9 @@ const formSchema = z.object({
 type FormSchema = z.infer<typeof formSchema>;
 
 export default function SettingsPage() {
+  const router = useRouter();
   const auth = useAuth();
+  const firestore = useFirestore();
   const { user, isUserLoading } = useUser();
   const { firebaseApp } = initializeFirebase();
   const storage = getStorage(firebaseApp);
@@ -40,6 +55,7 @@ export default function SettingsPage() {
   const [error, setError] = useState<string | null>(null);
   const [fileName, setFileName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
   const {
@@ -87,13 +103,20 @@ export default function SettingsPage() {
         photoURL = await getDownloadURL(storageRef);
       }
 
+      // Update Firebase Auth profile
       await updateProfile(user, {
         displayName: data.name,
         photoURL: photoURL,
       });
 
+      // Update Firestore document
+      const userDocRef = doc(firestore, 'users', user.uid);
+      await setDoc(userDocRef, {
+        name: data.name,
+        profilePhotoURL: photoURL,
+      }, { merge: true });
+
       // After updating, reload the user object to get the latest data.
-      // This is crucial for the UI to reflect the changes.
       await user.reload();
       
       // Reset form values to reflect the new state
@@ -115,6 +138,50 @@ export default function SettingsPage() {
       setFileName('');
     }
   };
+  
+  const handleDeleteAccount = async () => {
+    if (!user) return;
+    setIsDeleting(true);
+    try {
+      // 1. Delete user's profile photo from Storage if it exists
+      if (user.photoURL) {
+        // We need to derive the storage path from the URL.
+        // This assumes the default structure. Be cautious with this approach.
+        try {
+            const photoRef = ref(storage, `profilePhotos/${user.uid}`);
+            await deleteObject(photoRef);
+        } catch (storageError: any) {
+            // Log if the photo deletion fails but continue with account deletion
+            console.warn("Could not delete profile photo:", storageError.code);
+        }
+      }
+
+      // 2. Delete user's document from Firestore
+      const userDocRef = doc(firestore, 'users', user.uid);
+      await deleteDoc(userDocRef);
+
+      // 3. Delete user from Firebase Authentication
+      await deleteUser(user);
+
+      toast({
+        title: 'Account Deleted',
+        description: 'Your account has been permanently deleted.',
+      });
+      
+      // Redirect to home or login page after a short delay
+      setTimeout(() => router.push('/'), 1000);
+
+    } catch (err: any) {
+      console.error("Account deletion failed:", err);
+      setError("Failed to delete account. You may need to re-authenticate.");
+      // If re-authentication is required, Firebase throws 'auth/requires-recent-login'
+      if (err.code === 'auth/requires-recent-login') {
+          setError("This is a sensitive operation. Please log out and log back in before deleting your account.");
+      }
+      setIsDeleting(false);
+    }
+  };
+
 
   if (isUserLoading) {
     return <div className="flex justify-center items-center h-full">Loading...</div>;
@@ -197,6 +264,40 @@ export default function SettingsPage() {
           </form>
         </CardContent>
       </Card>
+      
+      <Card className="max-w-2xl border-destructive">
+        <CardHeader>
+            <CardTitle className="font-headline text-destructive">Danger Zone</CardTitle>
+            <CardDescription>
+                Once you delete your account, there is no going back. Please be certain.
+            </CardDescription>
+        </CardHeader>
+        <CardFooter>
+            <AlertDialog>
+                <AlertDialogTrigger asChild>
+                    <Button variant="destructive" disabled={isDeleting}>
+                        {isDeleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        Delete Account
+                    </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This action cannot be undone. This will permanently delete your account and remove your data from our servers.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDeleteAccount}>
+                            Yes, delete my account
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+        </CardFooter>
+    </Card>
+
     </div>
   );
 }
