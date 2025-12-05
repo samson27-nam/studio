@@ -1,3 +1,82 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "exec-1",
+      "description": "Photo of Society President",
+      "imageUrl": "https://images.unsplash.com/photo-1560250097-0b93528c311a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBoZWFkc2hvdHxlbnwwfHx8fDE3NjQ5MjMyOTB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "professional headshot"
+    },
+    {
+      "id": "exec-2",
+      "description": "Photo of Vice President",
+      "imageUrl": "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxwcm9mZXNzaW9uYWwlMjBoZWFkc2hvdHxlbnwwfHx8fDE3NjQ5MjMyOTB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "professional headshot"
+    },
+    {
+      "id": "exec-3",
+      "description": "Photo of Secretary",
+      "imageUrl": "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxwcm9mZXNzaW9uYWwlMjBoZWFkc2hvdHxlbnwwfHx8fDE3NjQ5MjMyOTB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "professional headshot"
+    },
+    {
+      "id": "exec-4",
+      "description": "Photo of Treasurer",
+      "imageUrl": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8cHJvZmVzc2lvbmFsJTIwaGVhZHNob3R8ZW58MHx8fHwxNzY0OTIzMjkwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "professional headshot"
+    },
+    {
+      "id": "exec-5",
+      "description": "Photo of Events Coordinator",
+      "imageUrl": "https://images.unsplash.com/photo-1595211877493-41a4e5f236b3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxwcm9mZXNzaW9uYWwlMjBoZWFkc2hvdHxlbnwwfHx8fDE3NjQ5MjMyOTB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "professional headshot"
+    },
+    {
+      "id": "exec-6",
+      "description": "Photo of Marketing Officer",
+      "imageUrl": "https://images.unsplash.com/photo-1701096374092-bb70915fdc5c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxwcm9mZXNzaW9uYWwlMjBoZWFkc2hvdHxlbnwwfHx8fDE3NjQ5MjMyOTB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "professional headshot"
+    },
+    {
+      "id": "user-1",
+      "description": "User avatar 1",
+      "imageUrl": "https://images.unsplash.com/photo-1641288883869-c463bc6c2a58?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxwZXJzb24lMjBhdmF0YXJ8ZW58MHx8fHwxNzY0OTMwNTQxfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "person avatar"
+    },
+    {
+      "id": "user-2",
+      "description": "User avatar 2",
+      "imageUrl": "https://images.unsplash.com/photo-1640951613773-54706e06851d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxwZXJzb24lMjBhdmF0YXJ8ZW58MHx8fHwxNzY0OTMwNTQxfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "person avatar"
+    },
+    {
+      "id": "user-3",
+      "description": "User avatar 3",
+      "imageUrl": "https://images.unsplash.com/photo-1724435811349-32d27f4d5806?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxwZXJzb24lMjBhdmF0YXJ8ZW58MHx8fHwxNzY0OTMwNTQxfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "person avatar"
+    },
+    {
+      "id": "user-4",
+      "description": "User avatar 4",
+      "imageUrl": "https://images.unsplash.com/photo-1641288883869-c463bc6c2a58?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxwZXJzb24lMjBhdmF0YXJ8ZW58MHx8fHwxNzY0OTMwNTQxfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "person avatar"
+    },
+    {
+      "id": "news-1",
+      "description": "Image for Annual Bridge Building Competition",
+      "imageUrl": "https://images.unsplash.com/photo-1603287696448-61d5b81cb720?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxicmlkZ2UlMjBjb25zdHJ1Y3Rpb258ZW58MHx8fHwxNzY0OTQwOTY5fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "bridge construction"
+    },
+    {
+      "id": "news-2",
+      "description": "Image for Guest Lecture on Sustainable Infrastructure",
+      "imageUrl": "https://images.unsplash.com/photo-1630404991412-9504d094e8ba?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxzdXN0YWluYWJsZSUyMGNpdHl8ZW58MHx8fHwxNzY0OTQ2MTg0fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "sustainable city"
+    },
+    {
+      "id": "news-3",
+      "description": "Image for Annual Society Dinner",
+      "imageUrl": "https://images.unsplash.com/photo-1764874299343-e55d7af327cd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxmb3JtYWwlMjBkaW5uZXJ8ZW58MHx8fHwxNzY0OTQ2MTg0fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "formal dinner"
+    }
+  ]
 }
