@@ -15,7 +15,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Logo } from '@/components/logo';
 import { useAuth, useUser } from '@/firebase';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
 
@@ -35,7 +35,9 @@ export default function LoginPage() {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       if (!userCredential.user.emailVerified) {
-        setError('Please verify your email before logging in.');
+        // Log the user out and redirect to verification page
+        await signOut(auth);
+        router.push(`/verify-email?email=${encodeURIComponent(email)}`);
         return;
       }
       router.push('/dashboard');
@@ -56,12 +58,14 @@ export default function LoginPage() {
   };
 
   useEffect(() => {
-    if (!isUserLoading && user) {
+    // Only redirect if user is loaded and verified
+    if (!isUserLoading && user && user.emailVerified) {
       router.push('/dashboard');
     }
   }, [user, isUserLoading, router]);
 
-  if (isUserLoading || user) {
+  // Show loading state while checking for a verified user session
+  if (isUserLoading || (user && user.emailVerified)) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         Loading...
