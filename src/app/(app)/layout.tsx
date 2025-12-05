@@ -123,13 +123,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <SidebarMenuItem>
               <SidebarMenuButton
                 asChild
+                isActive={pathname.startsWith('/settings')}
                 tooltip={{
                   children: 'Settings',
                   side: 'right',
                   align: 'center',
                 }}
               >
-                <Link href="#">
+                <Link href="/settings">
                   <Settings />
                   <span>Settings</span>
                 </Link>
@@ -162,9 +163,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>{user.displayName || user.email}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <Settings className="mr-2 h-4 w-4" />
-                  Settings
+                <DropdownMenuItem asChild>
+                  <Link href="/settings">
+                    <Settings className="mr-2 h-4 w-4" />
+                    Settings
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout}>
