@@ -46,12 +46,14 @@ export default function SettingsPage() {
     register,
     handleSubmit,
     watch,
+    reset,
     formState: { errors },
   } = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
+    values: {
       name: user?.displayName || '',
-    },
+      profilePhoto: null,
+    }
   });
 
   const profilePhoto = watch('profilePhoto');
@@ -78,7 +80,7 @@ export default function SettingsPage() {
     try {
       let photoURL = user.photoURL;
 
-      if (data.profilePhoto && data.profilePhoto[0]) {
+      if (data.profilePhoto && data.profilePhoto.length > 0) {
         const file = data.profilePhoto[0];
         const storageRef = ref(storage, `profilePhotos/${user.uid}`);
         await uploadBytes(storageRef, file);
@@ -90,7 +92,15 @@ export default function SettingsPage() {
         photoURL: photoURL,
       });
 
-      await user.reload(); // Refresh user data to get the latest profile
+      // After updating, reload the user object to get the latest data.
+      // This is crucial for the UI to reflect the changes.
+      await user.reload();
+      
+      // Reset form values to reflect the new state
+      reset({
+        name: user.displayName || '',
+        profilePhoto: null,
+      });
 
       toast({
         title: 'Profile Updated',
