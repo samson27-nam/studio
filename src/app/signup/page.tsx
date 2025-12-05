@@ -96,6 +96,9 @@ export default function SignupPage() {
         displayName: data.name,
         photoURL: photoURL,
       });
+
+      // After updating the profile, reload the user object to get the latest data
+      await user.reload();
       
       await sendEmailVerification(user);
       await signOut(auth);
