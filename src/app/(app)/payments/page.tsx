@@ -17,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import Image from 'next/image';
 
 export default function PaymentsPage() {
   return (
@@ -38,67 +39,31 @@ export default function PaymentsPage() {
             <CardHeader>
               <CardTitle className="font-headline">Annual Membership</CardTitle>
               <CardDescription>
-                Renew your membership for the 2024-2025 academic year.
+                Renew your membership for the 2024-2025 academic year. Amount:
+                MWK 50,000.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Name on card</Label>
-                <Input id="name" placeholder="John Doe" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="cardNumber">Card number</Label>
-                <Input id="cardNumber" placeholder="**** **** **** 1234" />
-              </div>
-              <div className="grid grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="month">Expires</Label>
-                  <Select>
-                    <SelectTrigger id="month">
-                      <SelectValue placeholder="Month" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1">January</SelectItem>
-                      <SelectItem value="2">February</SelectItem>
-                      <SelectItem value="3">March</SelectItem>
-                      <SelectItem value="4">April</SelectItem>
-                      <SelectItem value="5">May</SelectItem>
-                      <SelectItem value="6">June</SelectItem>
-                      <SelectItem value="7">July</SelectItem>
-                      <SelectItem value="8">August</SelectItem>
-                      <SelectItem value="9">September</SelectItem>
-                      <SelectItem value="10">October</SelectItem>
-                      <SelectItem value="11">November</SelectItem>
-                      <SelectItem value="12">December</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="year">&nbsp;</Label>
-                  <Select>
-                    <SelectTrigger id="year">
-                      <SelectValue placeholder="Year" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Array.from({ length: 10 }, (_, i) => (
-                        <SelectItem
-                          key={i}
-                          value={`${new Date().getFullYear() + i}`}
-                        >
-                          {new Date().getFullYear() + i}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="cvc">CVC</Label>
-                  <Input id="cvc" placeholder="123" />
-                </div>
+              <p className="text-sm font-medium">
+                Proceed to payment using PayChangu. You can use Airtel Money,
+                TNM Mpamba, or Bank Transfer.
+              </p>
+              <div className="flex items-center justify-center gap-4 p-4 rounded-md bg-muted">
+                  <Image src="https://paychangu.com/images/airtel-money.png" alt="Airtel Money" width={80} height={50} className="object-contain" />
+                  <Image src="https://paychangu.com/images/mpamba.png" alt="TNM Mpamba" width={80} height={50} className="object-contain" />
+                  <Image src="https://paychangu.com/images/standard-bank.png" alt="Standard Bank" width={80} height={50} className="object-contain" />
               </div>
             </CardContent>
             <CardFooter>
-              <Button className="w-full">Pay $50.00</Button>
+              <Button className="w-full">
+                <Image
+                  src="https://paychangu.com/images/pay_with_paychangu_blue.png"
+                  alt="Pay with PayChangu"
+                  width={150}
+                  height={40}
+                  className="object-contain"
+                />
+              </Button>
             </CardFooter>
           </Card>
         </TabsContent>
@@ -119,23 +84,33 @@ export default function PaymentsPage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="competition">
-                      Bridge Building Competition ($10)
+                      Bridge Building Competition (MWK 10,000)
                     </SelectItem>
                     <SelectItem value="dinner">
-                      Annual Society Dinner ($45)
+                      Annual Society Dinner (MWK 45,000)
                     </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2">
-                <p className="text-sm font-medium">Use saved payment method?</p>
-                <p className="text-sm text-muted-foreground">
-                  Card ending in 1234
-                </p>
+              <p className="text-sm font-medium">
+                Proceed to payment using PayChangu.
+              </p>
+               <div className="flex items-center justify-center gap-4 p-4 rounded-md bg-muted">
+                  <Image src="https://paychangu.com/images/airtel-money.png" alt="Airtel Money" width={80} height={50} className="object-contain" />
+                  <Image src="https://paychangu.com/images/mpamba.png" alt="TNM Mpamba" width={80} height={50} className="object-contain" />
+                  <Image src="https://paychangu.com/images/standard-bank.png" alt="Standard Bank" width={80} height={50} className="object-contain" />
               </div>
             </CardContent>
             <CardFooter>
-              <Button className="w-full">Confirm Registration</Button>
+              <Button className="w-full">
+                 <Image
+                  src="https://paychangu.com/images/pay_with_paychangu_blue.png"
+                  alt="Pay with PayChangu"
+                  width={150}
+                  height={40}
+                  className="object-contain"
+                />
+              </Button>
             </CardFooter>
           </Card>
         </TabsContent>

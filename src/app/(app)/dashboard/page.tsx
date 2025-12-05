@@ -21,7 +21,7 @@ import {
   CardFooter,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { DollarSign, Users, BarChart3, ArrowUpRight } from 'lucide-react';
+import { Users, BarChart3, ArrowUpRight } from 'lucide-react';
 import { news } from '@/lib/data';
 
 const analyticsData = [
@@ -48,10 +48,10 @@ export default function DashboardPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <span className="text-sm font-semibold">MWK</span>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$4,231.89</div>
+            <div className="text-2xl font-bold">MWK 4,231,890</div>
             <p className="text-xs text-muted-foreground">
               +20.1% from last month
             </p>
@@ -114,6 +114,12 @@ export default function DashboardPage() {
                   contentStyle={{
                     backgroundColor: 'hsl(var(--background))',
                     borderColor: 'hsl(var(--border))',
+                  }}
+                  formatter={(value: number, name: string) => {
+                    if (name === 'Total Revenue') {
+                      return [`MWK ${value.toLocaleString()}`, name];
+                    }
+                    return [value, name];
                   }}
                 />
                 <Legend />
