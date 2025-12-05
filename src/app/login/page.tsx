@@ -15,7 +15,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Logo } from '@/components/logo';
 import { useAuth, useUser } from '@/firebase';
-import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import {
+  signInWithEmailAndPassword,
+  sendEmailVerification,
+  signOut,
+} from 'firebase/auth';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
 
@@ -33,8 +37,14 @@ export default function LoginPage() {
     setError(null);
     setIsLoading(true);
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       if (!userCredential.user.emailVerified) {
+        // Send a verification email to the user.
+        await sendEmailVerification(userCredential.user);
         // Log the user out and redirect to verification page
         await signOut(auth);
         router.push(`/verify-email?email=${encodeURIComponent(email)}`);
