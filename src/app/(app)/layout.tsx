@@ -69,7 +69,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
       <Sidebar side="left" collapsible="icon">
-        <SidebarHeader>
+        <SidebarHeader className="p-4">
           <Logo />
         </SidebarHeader>
         <SidebarContent>

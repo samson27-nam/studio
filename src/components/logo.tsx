@@ -1,6 +1,6 @@
 import Link from 'next/link';
-import { Landmark } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import Image from 'next/image';
 
 export function Logo({ className }: { className?: string }) {
   return (
@@ -11,10 +11,14 @@ export function Logo({ className }: { className?: string }) {
         className
       )}
     >
-      <div className="rounded-md bg-primary p-1.5 text-primary-foreground">
-        <Landmark className="h-5 w-5" />
-      </div>
-      <span className="font-headline">ICES</span>
+      <Image
+        src="/logo.png"
+        alt="ICES Logo"
+        width={40}
+        height={40}
+        className="h-10 w-auto"
+      />
+      <span className="font-headline text-xl">ICES</span>
     </Link>
   );
 }
