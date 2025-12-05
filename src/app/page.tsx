@@ -7,7 +7,6 @@ import {
   Users,
   BarChart3,
   Landmark,
-  Sparkles,
   ClipboardList,
 } from 'lucide-react';
 import { Logo } from '@/components/logo';
@@ -36,12 +35,6 @@ const features = [
     title: 'News & Announcements',
     description:
       'Stay up-to-date with the latest news, events, and opportunities within the society.',
-  },
-  {
-    icon: <Sparkles className="h-8 w-8 text-primary" />,
-    title: 'AI-Powered Summaries',
-    description:
-      'Save time with AI-generated summaries of long forum posts, getting the key points instantly.',
   },
 ];
 

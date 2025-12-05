@@ -11,7 +11,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { ArrowLeft, MessageSquare } from 'lucide-react';
-import { SummarizeButton } from './summarize-button';
 
 export default function ForumThreadPage({ params }: { params: { id: string } }) {
   const thread = forumThreads.find((t) => t.id === params.id);
@@ -57,7 +56,6 @@ export default function ForumThreadPage({ params }: { params: { id: string } }) 
             <p className="whitespace-pre-wrap">{mainPost.content}</p>
           </CardContent>
           <CardFooter className="flex justify-end gap-2">
-            <SummarizeButton content={mainPost.content} />
             <Button variant="outline">
               <MessageSquare className="mr-2 h-4 w-4" />
               Reply
