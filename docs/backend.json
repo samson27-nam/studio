@@ -1,0 +1,387 @@
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user within the CivilConnect application.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the User entity."
+        },
+        "email": {
+          "type": "string",
+          "description": "User's email address.",
+          "format": "email"
+        },
+        "name": {
+          "type": "string",
+          "description": "The user's display name."
+        },
+        "profilePhotoURL": {
+          "type": "string",
+          "description": "URL of the user's profile photo.",
+          "format": "uri"
+        }
+      },
+      "required": [
+        "id",
+        "email",
+        "name"
+      ]
+    },
+    "ForumPost": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ForumPost",
+      "type": "object",
+      "description": "Represents a post within the CivilConnect forum.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the ForumPost entity."
+        },
+        "authorId": {
+          "type": "string",
+          "description": "Reference to the User who created the post. (Relationship: User 1:N ForumPost)"
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the forum post."
+        },
+        "content": {
+          "type": "string",
+          "description": "Content of the forum post."
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "Timestamp of when the post was created.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "authorId",
+        "title",
+        "content",
+        "timestamp"
+      ]
+    },
+    "ForumComment": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ForumComment",
+      "type": "object",
+      "description": "Represents a comment on a forum post.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the ForumComment entity."
+        },
+        "postId": {
+          "type": "string",
+          "description": "Reference to the ForumPost the comment belongs to. (Relationship: ForumPost 1:N ForumComment)"
+        },
+        "authorId": {
+          "type": "string",
+          "description": "Reference to the User who created the comment. (Relationship: User 1:N ForumComment)"
+        },
+        "content": {
+          "type": "string",
+          "description": "Content of the forum comment."
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "Timestamp of when the comment was created.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "postId",
+        "authorId",
+        "content",
+        "timestamp"
+      ]
+    },
+    "Event": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Event",
+      "type": "object",
+      "description": "Represents an event organized by the Civil Engineering Society.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Event entity."
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the event."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the event."
+        },
+        "location": {
+          "type": "string",
+          "description": "Location of the event."
+        },
+        "startTime": {
+          "type": "string",
+          "description": "Start time of the event.",
+          "format": "date-time"
+        },
+        "endTime": {
+          "type": "string",
+          "description": "End time of the event.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "description",
+        "location",
+        "startTime",
+        "endTime"
+      ]
+    },
+    "Executive": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Executive",
+      "type": "object",
+      "description": "Represents an executive member of the Civil Engineering Society.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Executive entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the executive member."
+        },
+        "role": {
+          "type": "string",
+          "description": "Role of the executive member."
+        },
+        "contactInfo": {
+          "type": "string",
+          "description": "Contact information for the executive member."
+        },
+        "profilePhotoURL": {
+          "type": "string",
+          "description": "URL of the executive member's profile photo.",
+          "format": "uri"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "role",
+        "contactInfo"
+      ]
+    },
+    "Payment": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Payment",
+      "type": "object",
+      "description": "Represents a payment made within the CivilConnect application.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Payment entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the User who made the payment. (Relationship: User 1:N Payment)"
+        },
+        "amount": {
+          "type": "number",
+          "description": "Amount of the payment."
+        },
+        "paymentDate": {
+          "type": "string",
+          "description": "Date of the payment.",
+          "format": "date-time"
+        },
+        "paymentType": {
+          "type": "string",
+          "description": "Type of payment (e.g., membership fee, event registration, sponsorship)."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "amount",
+        "paymentDate",
+        "paymentType"
+      ]
+    },
+    "NewsArticle": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "NewsArticle",
+      "type": "object",
+      "description": "Represents a news article or announcement.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the NewsArticle entity."
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the news article."
+        },
+        "content": {
+          "type": "string",
+          "description": "Content of the news article."
+        },
+        "authorId": {
+          "type": "string",
+          "description": "Reference to the User who wrote the article. (Relationship: User 1:N NewsArticle)"
+        },
+        "publishDate": {
+          "type": "string",
+          "description": "Date the article was published.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "content",
+        "authorId",
+        "publishDate"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user profile information.  Path-based ownership enables simple security rules: only the user can read/write their own profile.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/forum_posts/{postId}",
+        "definition": {
+          "entityName": "ForumPost",
+          "schema": {
+            "$ref": "#/backend/entities/ForumPost"
+          },
+          "description": "Stores forum posts. Publicly readable, but write access is controlled by the user's authentication status and potentially admin roles.",
+          "params": [
+            {
+              "name": "postId",
+              "description": "The unique identifier for the forum post."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/forum_posts/{postId}/comments/{commentId}",
+        "definition": {
+          "entityName": "ForumComment",
+          "schema": {
+            "$ref": "#/backend/entities/ForumComment"
+          },
+          "description": "Stores comments for each forum post. Nested within forum posts for easy retrieval. Publicly readable, but write access is controlled by the user's authentication status.",
+          "params": [
+            {
+              "name": "postId",
+              "description": "The unique identifier for the parent forum post."
+            },
+            {
+              "name": "commentId",
+              "description": "The unique identifier for the comment."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/events/{eventId}",
+        "definition": {
+          "entityName": "Event",
+          "schema": {
+            "$ref": "#/backend/entities/Event"
+          },
+          "description": "Stores event details. Publicly readable, with potential admin-controlled write access.",
+          "params": [
+            {
+              "name": "eventId",
+              "description": "The unique identifier for the event."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/executives/{executiveId}",
+        "definition": {
+          "entityName": "Executive",
+          "schema": {
+            "$ref": "#/backend/entities/Executive"
+          },
+          "description": "Stores executive member information. Admin-controlled read/write access.",
+          "params": [
+            {
+              "name": "executiveId",
+              "description": "The unique identifier for the executive member."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/payments/{paymentId}",
+        "definition": {
+          "entityName": "Payment",
+          "schema": {
+            "$ref": "#/backend/entities/Payment"
+          },
+          "description": "Stores payment information for each user.  Path-based ownership, so only the user (or an admin) can access their payments.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            },
+            {
+              "name": "paymentId",
+              "description": "The unique identifier for the payment."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/news_articles/{newsArticleId}",
+        "definition": {
+          "entityName": "NewsArticle",
+          "schema": {
+            "$ref": "#/backend/entities/NewsArticle"
+          },
+          "description": "Stores news articles. Publicly readable, with admin-controlled write access.",
+          "params": [
+            {
+              "name": "newsArticleId",
+              "description": "The unique identifier for the news article."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed to ensure Authorization Independence, DBAC (Database-Based Access Control), and support secure list operations (QAPs). User data is stored under `/users/{userId}` which is a path-based ownership model. Forum posts are stored in `/forum_posts/{postId}`. Forum comments are stored under `/forum_posts/{postId}/comments/{commentId}`. User ownership of Payments is maintained in `/users/{userId}/payments/{paymentId}`. News articles are stored in `/news_articles/{newsArticleId}`.  Executive members are stored in `/executives/{executiveId}`. Events are stored in `/events/{eventId}`.  This design avoids `get()` calls in security rules by denormalizing authorization data where necessary and uses structural segregation to maintain a homogeneous security posture within each collection.  Path-based ownership simplifies rules and enhances security. The membership map pattern isn't needed here as the data is largely user-owned and doesn't involve complex collaboration."
+  }
+}

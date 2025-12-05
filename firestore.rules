@@ -1,0 +1,216 @@
+/**
+ * # Firestore Security Rules
+ *
+ * ## Core Philosophy
+ * This ruleset enforces a hybrid security model designed for a community application.
+ * It combines a strict user-ownership model for private data with a public-read,
+ * owner-write model for shared community content. The primary goal is to ensure
+ * users have exclusive control over their personal information while allowing
+ * open consumption of public content like forum posts and news.
+ *
+ * ## Data Structure
+ * The data is organized into top-level collections for public content and user-specific
+ * subcollections for private data.
+ * - `/users/{userId}`: Contains private user profile data.
+ * - `/users/{userId}/payments/{paymentId}`: A private subcollection for a user's payments.
+ * - `/forum_posts`, `/news_articles`: Top-level collections for public content.
+ * - `/events`, `/executives`: Publicly readable collections, with writes intended for admins.
+ *
+ * ## Key Security Decisions
+ * - **User Data Privacy**: All paths under `/users/{userId}` are strictly accessible only
+ *   to the authenticated user whose UID matches the `{userId}`. This prevents any user
+ *   from reading another user's private data.
+ * - **Public Content**: Collections like `forum_posts` and `news_articles` are publicly
+ *   readable by anyone, including unauthenticated users. However, creating, updating,
+ *   or deleting this content is restricted to the authenticated author of the document.
+ * - **Admin-Managed Content**: Collections like `events` and `executives` are intended
+ *   for administrative control. In this prototyping phase, writes are disabled with
+ *   `TODO` markers, pending the implementation of a formal admin role system.
+ * - **No User Listing**: Listing documents in the top-level `/users` collection is
+ *   explicitly disallowed to protect user privacy and prevent enumeration attacks.
+ *
+ * ## Denormalization for Authorization
+ * To ensure fast and secure authorization, any document that requires ownership checks
+ * (like a `ForumPost` or `NewsArticle`) must have an `authorId` field directly on the
+ * document. This allows rules to verify ownership without performing costly and slow
+ * `get()` calls to other documents.
+ *
+ * ## Structural Segregation
+ * Private data (like `payments`) is segregated into user-owned subcollections, while
+ * public data (`forum_posts`) resides in top-level collections. This clear separation
+ * allows for simple, performant, and secure rules for list operations.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ------------------------------------------------------------------
+    // Helper Functions
+    // ------------------------------------------------------------------
+
+    /**
+     * Checks if the user is authenticated.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * Checks if the request comes from the owner of a document, identified by path.
+     */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /**
+     * Verifies that the document being modified or deleted already exists.
+     * Prevents writes to non-existent documents.
+     */
+    function isExistingDoc() {
+      return resource != null;
+    }
+
+    /**
+     * A composite check for update/delete operations on user-owned documents.
+     * Ensures the user is the owner AND the document exists.
+     */
+    function isExistingOwner(userId) {
+      return isOwner(userId) && isExistingDoc();
+    }
+
+    /**
+     * On create, verifies the new document's ownership field matches the user.
+     */
+    function isNewResourceOwner(ownerField) {
+      return isSignedIn() && request.resource.data[ownerField] == request.auth.uid;
+    }
+
+    /**
+     * On update/delete, verifies the existing document's ownership field matches the user.
+     */
+    function isExistingResourceOwner(ownerField) {
+      return isSignedIn() && isExistingDoc() && resource.data[ownerField] == request.auth.uid;
+    }
+
+    /**
+     * On update, ensures a specific field's value cannot be changed.
+     * Critical for preventing ownership transfers or re-linking documents.
+     */
+    function isImmutable(field) {
+      return request.resource.data[field] == resource.data[field];
+    }
+
+
+    // ------------------------------------------------------------------
+    // User Profile Rules
+    // ------------------------------------------------------------------
+
+    /**
+     * @description Manages user profile documents.
+     * @path /users/{userId}
+     * @allow (create) An authenticated user creating their own profile document.
+     * @deny (get) An authenticated user trying to read another user's profile.
+     * @principle Restricts access to a user's own data tree.
+     */
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if false; // Disallow listing all users for privacy
+      allow create: if isOwner(userId) && request.resource.data.id == userId;
+      allow update: if isExistingOwner(userId) && isImmutable('id');
+      allow delete: if isExistingOwner(userId);
+
+      /**
+       * @description Manages a user's private payment records.
+       * @path /users/{userId}/payments/{paymentId}
+       * @allow (get) An authenticated user reading one of their own payment records.
+       * @deny (list) An authenticated user trying to list payments for another user.
+       * @principle Enforces strict ownership on a private subcollection.
+       */
+      match /payments/{paymentId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId) && request.resource.data.userId == userId;
+        allow update: if isExistingOwner(userId) && isImmutable('userId');
+        allow delete: if isExistingOwner(userId);
+      }
+    }
+
+
+    // ------------------------------------------------------------------
+    // Forum Rules
+    // ------------------------------------------------------------------
+
+    /**
+     * @description Manages top-level forum posts.
+     * @path /forum_posts/{postId}
+     * @allow (get) Any user, authenticated or not, reading a forum post.
+     * @deny (update) A user trying to edit a post they did not author.
+     * @principle Implements a "Public Read, Owner-Only Write" model.
+     */
+    match /forum_posts/{postId} {
+      allow get, list: if true;
+      allow create: if isNewResourceOwner('authorId');
+      allow update: if isExistingResourceOwner('authorId') && isImmutable('authorId');
+      allow delete: if isExistingResourceOwner('authorId');
+
+      /**
+       * @description Manages comments on a forum post.
+       * @path /forum_posts/{postId}/comments/{commentId}
+       * @allow (create) Any authenticated user creating a comment on any post.
+       * @deny (delete) A user trying to delete a comment they did not author.
+       * @principle Implements a "Public Read, Owner-Only Write" model for nested content.
+       */
+      match /comments/{commentId} {
+        allow get, list: if true;
+        allow create: if isNewResourceOwner('authorId') && request.resource.data.postId == postId;
+        allow update: if isExistingResourceOwner('authorId') && isImmutable('authorId') && isImmutable('postId');
+        allow delete: if isExistingResourceOwner('authorId');
+      }
+    }
+
+
+    // ------------------------------------------------------------------
+    // Public Content Rules (Events, News, Executives)
+    // ------------------------------------------------------------------
+
+    /**
+     * @description Manages event details. Publicly readable.
+     * @path /events/{eventId}
+     * @allow (get) Any user reading event information.
+     * @deny (create) Any user trying to create an event.
+     * @principle Public read with admin-only writes. Writes are currently disabled.
+     */
+    match /events/{eventId} {
+      allow get, list: if true;
+      // CRITICAL: Cannot implement owner-only writes. The 'Event' entity is missing an 'ownerId' or 'authorId' field.
+      // Writes are disabled until the schema is updated to include an ownership link.
+      allow create, update, delete: if false; // TODO: Add admin validation once an admin role system is implemented.
+    }
+
+    /**
+     * @description Manages news articles.
+     * @path /news_articles/{newsArticleId}
+     * @allow (create) An authenticated user publishing a new article.
+     * @deny (update) A user trying to edit an article they did not write.
+     * @principle Implements a "Public Read, Owner-Only Write" model.
+     */
+    match /news_articles/{newsArticleId} {
+      allow get, list: if true;
+      allow create: if isNewResourceOwner('authorId');
+      allow update: if isExistingResourceOwner('authorId') && isImmutable('authorId');
+      allow delete: if isExistingResourceOwner('authorId');
+    }
+
+    /**
+     * @description Manages executive member profiles. Readable by signed-in users.
+     * @path /executives/{executiveId}
+     * @allow (get) An authenticated user viewing an executive's profile.
+     * @deny (create) Any user trying to add a new executive.
+     * @principle Read-only for general users, with writes reserved for admins.
+     */
+    match /executives/{executiveId} {
+      allow get, list: if isSignedIn();
+      // Writes are disabled as this content should only be managed by administrators.
+      allow create, update, delete: if false; // TODO: Add admin validation once an admin role system is implemented.
+    }
+  }
+}
