@@ -70,7 +70,7 @@ export default function Home() {
           />
           <div className="container relative mx-auto px-4 text-center text-primary-foreground">
             <h1 className="font-headline text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
-              CivilConnect
+              Innovation in Civil Engineering Society (ICES)
             </h1>
             <p className="mx-auto mt-4 max-w-2xl text-lg md:text-xl">
               Connecting the next generation of civil engineers through community,
@@ -91,7 +91,7 @@ export default function Home() {
                 Features for a Thriving Society
               </h2>
               <p className="mt-4 text-muted-foreground md:text-lg">
-                CivilConnect provides all the tools your student society needs
+                ICES provides all the tools your student society needs
                 to succeed.
               </p>
             </div>
@@ -115,7 +115,7 @@ export default function Home() {
         <div className="container mx-auto flex items-center justify-between px-4">
           <Logo />
           <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} CivilConnect. All rights reserved.
+            © {new Date().getFullYear()} ICES. All rights reserved.
           </p>
         </div>
       </footer>

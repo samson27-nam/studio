@@ -13,7 +13,7 @@ export default function ExecutivesPage() {
       <div>
         <h1 className="font-headline text-3xl font-bold">Executive Team</h1>
         <p className="text-muted-foreground">
-          Meet the dedicated leaders of the Civil Engineering Society.
+          Meet the dedicated leaders of the Innovation in Civil Engineering Society.
         </p>
       </div>
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
