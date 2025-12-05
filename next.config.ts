@@ -33,7 +33,13 @@ const nextConfig: NextConfig = {
         hostname: 'paychangu.com',
         port: '',
         pathname: '/**',
-      }
+      },
+      {
+        protocol: "https",
+        hostname: "firebasestorage.googleapis.com",
+        port: "",
+        pathname: "/**",
+      },
     ],
   },
 };
