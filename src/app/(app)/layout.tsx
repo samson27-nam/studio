@@ -155,6 +155,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                       src={user.photoURL || "https://picsum.photos/seed/user-avatar/40/40"}
                       alt="User avatar"
                       data-ai-hint="person avatar"
+                      key={user.photoURL}
                     />
                     <AvatarFallback>{user.email?.charAt(0).toUpperCase()}</AvatarFallback>
                   </Avatar>

@@ -29,7 +29,7 @@ import {
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { doc, setDoc } from 'firebase/firestore';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { AlertCircle, Upload } from 'lucide-react';
+import { AlertCircle, Upload, Loader2 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 
 const GoogleIcon = () => (
@@ -283,7 +283,7 @@ export default function SignupPage() {
               </div>
 
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? 'Creating Account...' : 'Create Account'}
+                {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Create Account' }
               </Button>
             </div>
           </form>

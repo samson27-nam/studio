@@ -102,6 +102,19 @@ export default function SettingsPage() {
       if (data.profilePhoto && data.profilePhoto.length > 0) {
         const file = data.profilePhoto[0];
         const storageRef = ref(storage, `user_profile_images/${user.uid}`);
+        
+        // If there was an old photo, delete it first to prevent caching issues
+        if(user.photoURL) {
+            try {
+                // The ref must be the same as the one used for upload
+                await deleteObject(storageRef);
+            } catch (storageError: any) {
+                 if (storageError.code !== 'storage/object-not-found') {
+                    console.warn("Could not delete old profile photo, but continuing with update:", storageError);
+                }
+            }
+        }
+        
         await uploadBytes(storageRef, file);
         photoURL = await getDownloadURL(storageRef);
       }
@@ -122,12 +135,6 @@ export default function SettingsPage() {
       // After updating, reload the user object to get the latest data.
       await user.reload();
       
-      // Reset form values to reflect the new state from the reloaded user object
-      reset({
-        name: user.displayName || '',
-        profilePhoto: null,
-      });
-
       toast({
         title: 'Profile Updated',
         description: 'Your profile information has been successfully updated.',
@@ -137,6 +144,11 @@ export default function SettingsPage() {
       console.error(err);
     } finally {
       setIsLoading(false);
+      // Reset form state to not dirty and clear previews
+      reset({
+        name: data.name,
+        profilePhoto: null
+      });
       setPhotoPreview(null);
       setFileName('');
     }
@@ -148,7 +160,6 @@ export default function SettingsPage() {
     try {
       // 1. Delete user's profile photo from Storage if it exists
       if (user.photoURL) {
-        // We need to derive the storage path from the URL.
         try {
             const photoRef = ref(storage, `user_profile_images/${user.uid}`);
             await deleteObject(photoRef);
@@ -217,7 +228,7 @@ export default function SettingsPage() {
                 <Label>Current Profile Photo</Label>
                  <div className="flex items-center gap-4">
                     <Avatar className="h-24 w-24">
-                        <AvatarImage src={photoPreview || user?.photoURL || ''} alt={user?.displayName || 'User'} />
+                        <AvatarImage src={photoPreview || user?.photoURL || ''} alt={user?.displayName || 'User'} key={user?.photoURL} />
                         <AvatarFallback>{user?.displayName?.charAt(0) || user?.email?.charAt(0)}</AvatarFallback>
                     </Avatar>
                      <Button
