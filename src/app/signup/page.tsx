@@ -17,7 +17,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Logo } from '@/components/logo';
-import { useAuth, initializeFirebase } from '@/firebase';
+import { useAuth, useFirestore, useStorage } from '@/firebase';
 import {
   createUserWithEmailAndPassword,
   sendEmailVerification,
@@ -26,7 +26,7 @@ import {
   signInWithPopup,
   GoogleAuthProvider,
 } from 'firebase/auth';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { doc, setDoc } from 'firebase/firestore';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle, Upload, Loader2 } from 'lucide-react';
@@ -73,8 +73,8 @@ type FormSchema = z.infer<typeof formSchema>;
 export default function SignupPage() {
   const router = useRouter();
   const auth = useAuth();
-  const { firebaseApp, firestore } = initializeFirebase();
-  const storage = getStorage(firebaseApp);
+  const firestore = useFirestore();
+  const storage = useStorage();
   const [error, setError] = useState<string | null>(null);
   const [fileName, setFileName] = useState('');
   const [isLoading, setIsLoading] = useState(false);

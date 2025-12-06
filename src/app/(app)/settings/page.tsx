@@ -15,9 +15,9 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useAuth, useUser, initializeFirebase, useFirestore } from '@/firebase';
+import { useAuth, useUser, useFirestore, useStorage } from '@/firebase';
 import { updateProfile, deleteUser } from 'firebase/auth';
-import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
+import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { doc, setDoc, deleteDoc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -48,8 +48,7 @@ export default function SettingsPage() {
   const auth = useAuth();
   const firestore = useFirestore();
   const { user, isUserLoading } = useUser();
-  const { firebaseApp } = initializeFirebase();
-  const storage = getStorage(firebaseApp);
+  const storage = useStorage();
   const { toast } = useToast();
 
   const [error, setError] = useState<string | null>(null);
