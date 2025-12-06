@@ -3,22 +3,15 @@
  * @fileOverview A flow for summarizing text content.
  *
  * - summarizeText - A function that handles the text summarization.
- * - SummarizeTextInputSchema - The input type for the summarizeText function.
- * - SummarizeTextOutputSchema - The return type for the summarizeText function.
  */
 
 import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
-
-export const SummarizeTextInputSchema = z.object({
-  text: z.string().describe('The text to be summarized.'),
-});
-export type SummarizeTextInput = z.infer<typeof SummarizeTextInputSchema>;
-
-export const SummarizeTextOutputSchema = z.object({
-  summary: z.string().describe('The summarized version of the text.'),
-});
-export type SummarizeTextOutput = z.infer<typeof SummarizeTextOutputSchema>;
+import {
+  SummarizeTextInputSchema,
+  type SummarizeTextInput,
+  SummarizeTextOutputSchema,
+  type SummarizeTextOutput,
+} from '@/ai/schemas/summarize-schemas';
 
 export async function summarizeText(
   input: SummarizeTextInput
