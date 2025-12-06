@@ -63,7 +63,8 @@ export default function SettingsPage() {
     handleSubmit,
     watch,
     reset,
-    formState: { errors },
+    setValue,
+    formState: { errors, isDirty },
   } = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
     values: {
@@ -77,6 +78,7 @@ export default function SettingsPage() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
+      setValue('profilePhoto', e.target.files, { shouldDirty: true });
       setFileName(file.name);
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -84,6 +86,7 @@ export default function SettingsPage() {
       };
       reader.readAsDataURL(file);
     } else {
+      setValue('profilePhoto', null);
       setFileName('');
       setPhotoPreview(null);
     }
@@ -119,7 +122,7 @@ export default function SettingsPage() {
       // After updating, reload the user object to get the latest data.
       await user.reload();
       
-      // Reset form values to reflect the new state
+      // Reset form values to reflect the new state from the reloaded user object
       reset({
         name: user.displayName || '',
         profilePhoto: null,
@@ -227,12 +230,12 @@ export default function SettingsPage() {
                             <Upload className="mr-2" />
                             <span>{fileName || 'Upload a new image'}</span>
                             <Input
-                            id="profile-photo"
-                            type="file"
-                            className="absolute inset-0 opacity-0"
-                            {...register('profilePhoto')}
-                            onChange={handleFileChange}
-                            accept="image/*"
+                              id="profile-photo"
+                              type="file"
+                              className="absolute inset-0 opacity-0"
+                              {...register('profilePhoto')}
+                              onChange={handleFileChange}
+                              accept="image/*"
                             />
                         </div>
                         </Button>
@@ -258,7 +261,7 @@ export default function SettingsPage() {
               <p className="text-xs text-muted-foreground">Email address cannot be changed.</p>
             </div>
 
-            <Button type="submit" disabled={isLoading}>
+            <Button type="submit" disabled={isLoading || !isDirty}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Save Changes
             </Button>
