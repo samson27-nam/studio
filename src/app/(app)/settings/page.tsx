@@ -32,7 +32,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { AlertCircle, Upload, Loader2, LogOut } from 'lucide-react';
+import { AlertCircle, Upload, Loader2 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useRouter } from 'next/navigation';
 
@@ -149,13 +149,13 @@ export default function SettingsPage() {
       // 1. Delete user's profile photo from Storage if it exists
       if (user.photoURL) {
         // We need to derive the storage path from the URL.
-        // This assumes the default structure. Be cautious with this approach.
         try {
             const photoRef = ref(storage, `user_profile_images/${user.uid}`);
             await deleteObject(photoRef);
         } catch (storageError: any) {
-            // Log if the photo deletion fails but continue with account deletion
-            console.warn("Could not delete profile photo:", storageError.code);
+            if (storageError.code !== 'storage/object-not-found') {
+              console.warn("Could not delete profile photo, but continuing with account deletion:", storageError.code);
+            }
         }
       }
 
@@ -171,17 +171,16 @@ export default function SettingsPage() {
         description: 'Your account has been permanently deleted.',
       });
       
-      // Redirect to home or login page after a short delay
-      setTimeout(() => router.push('/'), 1000);
+      router.push('/');
 
     } catch (err: any)
       {
       console.error("Account deletion failed:", err);
-      setError("Failed to delete account. You may need to re-authenticate.");
-      // If re-authentication is required, Firebase throws 'auth/requires-recent-login'
+      let errorMessage = "Failed to delete account. You may need to re-authenticate.";
       if (err.code === 'auth/requires-recent-login') {
-          setError("This is a sensitive operation. Please log out and log back in before deleting your account.");
+          errorMessage = "This is a sensitive operation. Please log out and log back in before deleting your account.";
       }
+      setError(errorMessage);
       setIsDeleting(false);
     }
   };
@@ -293,7 +292,7 @@ export default function SettingsPage() {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleDeleteAccount}>
+                        <AlertDialogAction onClick={handleDeleteAccount} disabled={isDeleting}>
                             Yes, delete my account
                         </AlertDialogAction>
                     </AlertDialogFooter>

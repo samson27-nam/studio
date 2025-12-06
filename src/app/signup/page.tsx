@@ -109,7 +109,7 @@ export default function SignupPage() {
       );
       const user = userCredential.user;
 
-      let photoURL: string | undefined = undefined;
+      let photoURL: string | null = null;
       if (data.profilePhoto && data.profilePhoto[0]) {
         const file = data.profilePhoto[0];
         const storageRef = ref(storage, `user_profile_images/${user.uid}`);
@@ -128,7 +128,7 @@ export default function SignupPage() {
         id: user.uid,
         name: data.name,
         email: data.email,
-        profilePhotoURL: photoURL || null,
+        profilePhotoURL: photoURL,
       });
 
       // After updating the profile, reload the user object to get the latest data
