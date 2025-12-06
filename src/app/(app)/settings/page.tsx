@@ -95,54 +95,56 @@ export default function SettingsPage() {
     if (!user) return;
     setError(null);
     setIsLoading(true);
+    
     try {
-      let photoURL = user.photoURL;
+      let photoURL = user.photoURL; // Start with the current photo URL
 
+      // 1. If a new photo is uploaded, handle the storage operations
       if (data.profilePhoto && data.profilePhoto.length > 0) {
         const file = data.profilePhoto[0];
         const storageRef = ref(storage, `user_profile_images/${user.uid}`);
         
-        // If there was an old photo that was uploaded by us, delete it first.
-        // We know it was uploaded by us if the URL contains 'firebasestorage.googleapis.com'
-        if(user.photoURL && user.photoURL.includes('firebasestorage.googleapis.com')) {
-            try {
-                // The ref must point to the file to be deleted.
-                await deleteObject(storageRef);
-            } catch (storageError: any) {
-                 if (storageError.code !== 'storage/object-not-found') {
-                    // Log a warning but don't block the update.
-                    console.warn("Could not delete old profile photo, but continuing with update:", storageError);
-                }
+        // If there's an old photo THAT WE UPLOADED, delete it.
+        // Google photo URLs won't contain this string.
+        if (user.photoURL && user.photoURL.includes('firebasestorage.googleapis.com')) {
+          try {
+            await deleteObject(storageRef);
+          } catch (storageError: any) {
+            if (storageError.code !== 'storage/object-not-found') {
+              console.warn("Could not delete old profile photo, but continuing with update:", storageError);
             }
+          }
         }
         
+        // Upload the new file and get the new URL
         await uploadBytes(storageRef, file);
         photoURL = await getDownloadURL(storageRef);
       }
 
-      // Update Firebase Auth profile
+      // 2. Update Firebase Auth profile
       await updateProfile(user, {
         displayName: data.name,
-        photoURL: photoURL,
+        photoURL: photoURL, // Use the potentially updated photoURL
       });
-
-      // Update Firestore document
+      
+      // 3. Update Firestore document with the final data
       const userDocRef = doc(firestore, 'users', user.uid);
       await setDoc(userDocRef, {
         name: data.name,
-        profilePhotoURL: photoURL,
+        profilePhotoURL: photoURL, // Use the same final photoURL
       }, { merge: true });
 
-      // After updating, reload the user object to get the latest data.
+      // 4. Force a reload of the user object to get all fresh data
       await user.reload();
-      
+
       toast({
         title: 'Profile Updated',
         description: 'Your profile information has been successfully updated.',
       });
+
     } catch (err: any) {
       setError('An unexpected error occurred. Please try again.');
-      console.error(err);
+      console.error("Update failed:", err);
     } finally {
       setIsLoading(false);
       // Reset form state to not dirty and clear previews
@@ -316,5 +318,3 @@ export default function SettingsPage() {
     </div>
   );
 }
-
-    
