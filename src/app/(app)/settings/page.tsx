@@ -102,13 +102,15 @@ export default function SettingsPage() {
         const file = data.profilePhoto[0];
         const storageRef = ref(storage, `user_profile_images/${user.uid}`);
         
-        // If there was an old photo, delete it first to prevent caching issues
-        if(user.photoURL) {
+        // If there was an old photo that was uploaded by us, delete it first.
+        // We know it was uploaded by us if the URL contains 'firebasestorage.googleapis.com'
+        if(user.photoURL && user.photoURL.includes('firebasestorage.googleapis.com')) {
             try {
-                // The ref must be the same as the one used for upload
+                // The ref must point to the file to be deleted.
                 await deleteObject(storageRef);
             } catch (storageError: any) {
                  if (storageError.code !== 'storage/object-not-found') {
+                    // Log a warning but don't block the update.
                     console.warn("Could not delete old profile photo, but continuing with update:", storageError);
                 }
             }
@@ -157,8 +159,8 @@ export default function SettingsPage() {
     if (!user) return;
     setIsDeleting(true);
     try {
-      // 1. Delete user's profile photo from Storage if it exists
-      if (user.photoURL) {
+      // 1. Delete user's profile photo from Storage if it exists and was uploaded by us
+      if (user.photoURL && user.photoURL.includes('firebasestorage.googleapis.com')) {
         try {
             const photoRef = ref(storage, `user_profile_images/${user.uid}`);
             await deleteObject(photoRef);
@@ -314,3 +316,5 @@ export default function SettingsPage() {
     </div>
   );
 }
+
+    
