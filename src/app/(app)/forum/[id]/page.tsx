@@ -1,3 +1,5 @@
+'use client';
+
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { forumThreads } from '@/lib/data';
@@ -10,16 +12,51 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { ArrowLeft, MessageSquare } from 'lucide-react';
+import { ArrowLeft, MessageSquare, Sparkles, Loader2 } from 'lucide-react';
+import * as React from 'react';
+import { summarizeText } from '@/ai/flows/summarize-flow';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 export default function ForumThreadPage({ params }: { params: { id: string } }) {
   const thread = forumThreads.find((t) => t.id === params.id);
+  const [isLoadingSummary, setIsLoadingSummary] = React.useState(false);
+  const [summary, setSummary] = React.useState<string | null>(null);
+  const [summaryError, setSummaryError] = React.useState<string | null>(null);
 
   if (!thread) {
     notFound();
   }
 
   const [mainPost, ...replies] = thread.posts;
+
+  const handleSummarize = async () => {
+    if (!mainPost) return;
+    setIsLoadingSummary(true);
+    setSummary(null);
+    setSummaryError(null);
+    try {
+      const result = await summarizeText({ text: mainPost.content });
+      setSummary(result.summary);
+    } catch (error) {
+      console.error('Failed to generate summary:', error);
+      setSummaryError('Sorry, we couldn\'t generate a summary at this time.');
+    } finally {
+      setIsLoadingSummary(false);
+    }
+  };
+
+  const closeSummaryDialog = () => {
+    setSummary(null);
+    setSummaryError(null);
+  };
 
   return (
     <div className="flex flex-col gap-6">
@@ -56,6 +93,14 @@ export default function ForumThreadPage({ params }: { params: { id: string } }) 
             <p className="whitespace-pre-wrap">{mainPost.content}</p>
           </CardContent>
           <CardFooter className="flex justify-end gap-2">
+            <Button variant="outline" onClick={handleSummarize} disabled={isLoadingSummary}>
+              {isLoadingSummary ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Sparkles className="mr-2 h-4 w-4" />
+              )}
+              Summarize
+            </Button>
             <Button variant="outline">
               <MessageSquare className="mr-2 h-4 w-4" />
               Reply
@@ -93,6 +138,19 @@ export default function ForumThreadPage({ params }: { params: { id: string } }) 
           </div>
         </>
       )}
+      <AlertDialog open={!!summary || !!summaryError} onOpenChange={closeSummaryDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{summaryError ? 'Error' : 'AI Summary'}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {summary || summaryError}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={closeSummaryDialog}>Close</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
