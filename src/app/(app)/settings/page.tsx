@@ -228,7 +228,7 @@ export default function SettingsPage() {
                 <Label>Current Profile Photo</Label>
                  <div className="flex items-center gap-4">
                     <Avatar className="h-24 w-24">
-                        <AvatarImage src={photoPreview || user?.photoURL || ''} alt={user?.displayName || 'User'} key={user?.photoURL} />
+                        <AvatarImage src={photoPreview || user?.photoURL || undefined} alt={user?.displayName || 'User'} key={user?.photoURL} />
                         <AvatarFallback>{user?.displayName?.charAt(0) || user?.email?.charAt(0)}</AvatarFallback>
                     </Avatar>
                      <Button
